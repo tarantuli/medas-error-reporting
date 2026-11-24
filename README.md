@@ -16,6 +16,8 @@ Exception logging, exception email alerting, and debug variable logging. All thr
 | `ThrowableNormalizer` | Converts a `\Throwable` to a plain array (used by `JsonHandler`)                      |
 | `TraceNormalizer`     | Converts a stack trace to a plain array of `{file, line, function, arguments}` frames |
 
+Reports leave credentials out (`InformationCompilers\Redactor`): the `Authorization`, `Proxy-Authorization` and `Cookie` headers, also as Apache passes them on (`REDIRECT_HTTP_AUTHORIZATION`), `PHP_AUTH_PW` and `PHP_AUTH_DIGEST`, and in the query and a JSON or form body every field whose name holds `password`, `passwd`, `passphrase`, `secret`, `token` or `api-key`/`api_key`/`apiKey`. Their value becomes `[removed]`, so a report still shows they were there.
+
 `ExceptionLogger` writes one file per exception, naming it via a configurable `{dateYmd}_{timeHi}_{message}.log` pattern. `BadRequestException` (4xx HTTP errors) can be suppressed independently of other exceptions.
 
 `ExceptionMailer` is only active when all SMTP fields are configured. It clones the PHPMailer instance per sending so the service remains stateless between calls. Mailing failures are silently discarded to ensure that error handling itself never throws.

@@ -50,7 +50,7 @@ abstract readonly class BaseCompiler
             if (str_starts_with($name, 'HTTP_')) {
                 $header = str_replace('_', '-', substr($name, 5));
                 $header = ucwords(strtolower($header), '-');
-                $headers[$header] = $value;
+                $headers[$header] = Redactor::serverValue($name, $value);
             }
         }
 
@@ -73,7 +73,7 @@ abstract readonly class BaseCompiler
 
         $output .= "\n=== QUERY PARAMS ===\n\n";
 
-        foreach ($_GET as $name => $value) {
+        foreach (Redactor::fields($_GET) as $name => $value) {
             $output .= sprintf(
                 "%-30s   %s\n",
                 $name,
@@ -91,7 +91,7 @@ abstract readonly class BaseCompiler
         }
 
         $output .= "\n=== POST BODY ===\n\n";
-        $output .= $input . "\n";
+        $output .= Redactor::body($input, (string) ($_SERVER['CONTENT_TYPE'] ?? '')) . "\n";
     }
 
     protected function addServerInformation(string &$output): void
@@ -99,6 +99,7 @@ abstract readonly class BaseCompiler
         $output .= "\n=== SERVER ===\n\n";
 
         foreach ($_SERVER as $name => $value) {
+            $value = Redactor::serverValue((string) $name, $value);
             $output .= sprintf("%-20s   %s\n", $name, is_scalar($value) ? $value : gettype($value));
         }
     }
